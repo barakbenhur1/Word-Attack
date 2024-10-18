@@ -115,7 +115,7 @@ async function getMember(diffcultyKey, email) {
         if (member.email == email) {
           let words = member.words;
 
-          if (diffculty.words.length == words.length) {
+          if (diffculty.words.length <= words.length) {
             const length =
               diffculty.value == "Easy"
                 ? 4
