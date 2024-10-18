@@ -6,7 +6,7 @@ const server = app.listen(3000, () => {
   console.log("listening on *:3000");
 });
 
-server.timeout = 1500;
+server.timeout = 8000;
 
 const login = require("./src/Routers/login");
 const words = require("./src/Routers/words");

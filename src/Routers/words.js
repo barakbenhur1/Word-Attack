@@ -44,6 +44,8 @@ async function getWord(diffcultyKey, email, res) {
     },
   };
 
+  console.log(answer)
+
   res.send(result.wrap(answer));
 }
 
