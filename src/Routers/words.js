@@ -44,7 +44,7 @@ async function getWord(diffcultyKey, email, res) {
     },
   };
 
-  res.send(result.wrap(answer));
+  res.send(answer);
 }
 
 async function addGuess(diffcultyKey, email, guess, res) {
@@ -71,7 +71,7 @@ async function scoreboard(email, res) {
   const profile = await Profile.findOne({ email: email });
   const languageKey = profile.language;
   let language = await Languages.findOne({ value: languageKey });
-  res.send(result.wrap(language.days));
+  res.send(language.days);
 }
 
 async function getMember(diffcultyKey, email) {
