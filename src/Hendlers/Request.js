@@ -3,15 +3,15 @@ const axios = require("axios");
 const result = require("./Result");
 
 // Function to fetch a random article title from Wikipedia with language and length options
-async function getWord(language, length, maxReqeusts) {
+async function getWord(language, length, words, maxReqeusts) {
   if (!maxReqeusts && language == "en") {
-    return await getEnglishWord(length);
+    return await getEnglishWord(length, words);
   } else {
-    return await getFromWiki(language, length);
+    return await getFromWiki(language, length, words);
   }
 }
 
-async function getFromWiki(language, length) {
+async function getFromWiki(language, length, words) {
   const url = `https://${language}.wikipedia.org/w/api.php`;
 
   const params = {
@@ -35,12 +35,16 @@ async function getFromWiki(language, length) {
       const combinedWords = [...titleWords, ...extractWords];
       const word = combinedWords.find(
         (w) =>
-          w.length === length &&
-          (language == "en" ? isEnglish(w) : isHebrew(w))
+          w.length === length && (language == "en" ? isEnglish(w) : isHebrew(w))
       );
 
-      if (result.exsit(word) && (await isWordInLanguage(word, language)))
+      if (
+        result.exsit(word) &&
+        (await isWordInLanguage(word, language)) &&
+        !words.includes(word)
+      ) {
         return word;
+      }
     }
     return getFromWiki(language, length);
   } catch (error) {
@@ -48,7 +52,7 @@ async function getFromWiki(language, length) {
   }
 }
 
-async function getEnglishWord(length) {
+async function getEnglishWord(length, words) {
   const options = {
     method: "GET",
     url: "https://word-generator2.p.rapidapi.com/",
@@ -65,20 +69,24 @@ async function getEnglishWord(length) {
     if (wordList.length === 0) {
       return `No English words found with length ${length}.`;
     }
-    return wordList[Math.floor(Math.random() * wordList.length)];
+    const word = wordList[Math.floor(Math.random() * wordList.length)];
+    if (words.includes(word)) {
+      return getEnglishWord(length, words);
+    }
+    return word;
   } catch (error) {
     return console.error("Error fetching word:", error);
   }
 }
 
 function isHebrew(str) {
-  const hebrewRegex = /^[\u0590-\u05FF\s]+$/; // Hebrew character range and whitespace allowed
+  const hebrewRegex = /^[\u0590-\u05FF]+$/;
   return hebrewRegex.test(str);
 }
 
 function isEnglish(text) {
   // Regular expression to match only English letters (both uppercase and lowercase) and spaces
-  const englishRegex = /^[A-Za-z\s]+$/;
+  const englishRegex = /^[A-Za-z]+$/;
   return englishRegex.test(text);
 }
 

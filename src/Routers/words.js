@@ -60,8 +60,12 @@ async function score(diffcultyKey, email, res) {
   const member = await getMember(diffcultyKey, email);
   const words = member[0].words;
   const word = words[words.length - 1];
-  const points = words.length % 5 == 0 ? 40 : 20;
-  member[0].totalScore += 5 * points - word.guesswork.length * points;
+  let score = 0;
+  for (i = 0; i < words.length; i++) {
+    const points = (i + 1) % 5 == 0 ? 40 : 20;
+    score += 5 * points - words[i].guesswork.length * points;
+  }
+  member[0].totalScore = score;
   word.done = true;
   member[1].save();
   res.send({});
@@ -71,7 +75,11 @@ async function scoreboard(email, res) {
   const profile = await Profile.findOne({ email: email });
   const languageKey = profile.language;
   let language = await Languages.findOne({ value: languageKey });
-  res.send(language.days);
+  if (!result.exsit(language)) {
+    res.send([]);
+  } else {
+    res.send(language.days);
+  }
 }
 
 async function getMember(diffcultyKey, email) {
@@ -115,7 +123,7 @@ async function getMember(diffcultyKey, email) {
         if (member.email == email) {
           let words = member.words;
 
-          if (diffculty.words.length <= words.length) {
+          if (diffculty.words.length == words.length) {
             const length =
               diffculty.value == "Easy"
                 ? 4
