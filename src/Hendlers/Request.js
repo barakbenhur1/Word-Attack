@@ -46,7 +46,7 @@ async function getFromWiki(language, length, words) {
         return word;
       }
     }
-    return getFromWiki(language, length);ç
+    return getFromWiki(language, length, words);
   } catch (error) {
     return error;
   }
@@ -100,7 +100,7 @@ async function isWordInLanguage(word, language) {
       const page = Object.values(pages)[0];
 
       // If there is an extract, the word exists
-      return page.extract ? true : false;
+      return result.exsit(page.extract);
     } catch (error) {
       console.error("Error:", error.message);
       return false; // Word does not exist
