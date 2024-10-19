@@ -3,8 +3,8 @@ const axios = require("axios");
 const result = require("./Result");
 
 // Function to fetch a random article title from Wikipedia with language and length options
-async function getWord(language, length, words, maxReqeusts) {
-  if (!maxReqeusts && language == "en") {
+async function getWord(language, length, words) {
+  if (words.length < 10000 && language == "en") {
     return await getEnglishWord(length, words);
   } else {
     return await getFromWiki(language, length, words);

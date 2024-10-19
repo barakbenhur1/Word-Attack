@@ -132,7 +132,7 @@ async function getMember(diffcultyKey, email) {
                 : 6;
 
             diffculty.words.push(
-              await req.getWord(profile.language, length, words.length == 10000)
+              await req.getWord(profile.language, length, diffculty.words)
             );
             language.save();
             return getMember(diffcultyKey, email);
