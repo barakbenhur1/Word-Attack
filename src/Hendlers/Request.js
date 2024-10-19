@@ -46,7 +46,7 @@ async function getFromWiki(language, length, words) {
         return word;
       }
     }
-    return getFromWiki(language, length);
+    return getFromWiki(language, length);ç
   } catch (error) {
     return error;
   }
