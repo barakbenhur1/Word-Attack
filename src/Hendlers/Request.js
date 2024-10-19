@@ -93,17 +93,26 @@ function isEnglish(text) {
 async function isWordInLanguage(word, language) {
   if (language == "he") {
     try {
-      const url = `https://he.wiktionary.org/w/api.php?action=query&titles=${word}&prop=extracts&format=json&explaintext`;
+      const url = `https://he.wiktionary.org/w/api.php?action=query&titles=${word}&prop=categories|extracts&format=json&explaintext`;
       const response = await axios.get(url);
 
       const pages = response.data.query.pages;
       const page = Object.values(pages)[0];
 
-      // If there is an extract, the word exists
-      return result.exsit(page.extract);
+      // If no page extract found, word does not exist
+      if (!page.extract) return false;
+
+      // Check if the word is categorized as a name
+      const isName =
+        page.categories &&
+        page.categories.some((category) =>
+          category.title.includes("שמות פרטיים")
+        );
+
+      return !isName; // Return true if it's a valid word and not a name
     } catch (error) {
       console.error("Error:", error.message);
-      return false; // Word does not exist
+      return false; // Error or not found
     }
   } else {
     try {
