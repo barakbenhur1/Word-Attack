@@ -83,7 +83,7 @@ async function scoreboard(email, res) {
 }
 
 async function getMember(diffcultyKey, email) {
-  const dayKey = moment().tz("Israel/Tel_Aviv").format("DD/MM/YYYY");
+  const dayKey = moment().utc().format("DD/MM/YYYY");
 
   const profile = await Profile.findOne({ email: email });
   const languageKey = profile.language;
