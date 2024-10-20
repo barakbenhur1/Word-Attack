@@ -115,27 +115,15 @@ async function isWordInLanguage(word, language) {
       return false; // Error or not found
     }
   } else {
+    const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`;
+
     try {
-      // Replace with the actual dictionary API URL (Wordnik, Oxford, etc.)
-      const url = `https://api.dictionaryapi.dev/api/v2/entries/${language}/${word}`;
-
-      // Make API request
       const response = await axios.get(url);
-
-      // If a definition is found, the word exists in the language
-      if (response.data.length > 0) {
-        return true; // Word exists
-      }
+      return response.data && response.data.length > 0;
     } catch (error) {
-      // If the word doesn't exist or there's an error, return false
-      console.error(
-        "Error or word not found:",
-        error.response?.statusText || error.message
-      );
-      return false;
+      console.error("Error verifying word:", error.message);
+      return false; // Word not valid or error
     }
-
-    return false;
   }
 }
 
