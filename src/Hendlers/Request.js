@@ -4,11 +4,13 @@ const result = require("./Result");
 
 // Function to fetch a random article title from Wikipedia with language and length options
 async function getWord(language, length, words) {
-  if (words.length < 10000 && language == "en") {
-    return await getEnglishWord(length, words);
-  } else {
-    return await getFromWiki(language, length, words);
-  }
+  // if (words.length < 10000 && language == "en") {
+  //   return await getEnglishWord(length, words);
+  // } else {
+  //   return await getFromWiki(language, length, words);
+  // }
+
+  return await getFromWiki(language, length, words);
 }
 
 async function getFromWiki(language, length, words) {
@@ -70,6 +72,7 @@ async function getEnglishWord(length, words) {
       return `No English words found with length ${length}.`;
     }
     const word = wordList[Math.floor(Math.random() * wordList.length)];
+    console.log(length, word, wordList)
     if (words.includes(word)) {
       return getEnglishWord(length, words);
     }
