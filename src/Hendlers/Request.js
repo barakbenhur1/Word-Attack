@@ -3,17 +3,15 @@ const axios = require("axios");
 const result = require("./Result");
 
 // Function to fetch a random article title from Wikipedia with language and length options
-async function getWord(language, length, words) {
-  // if (words.length < 10000 && language == "en") {
-  //   return await getEnglishWord(length, words);
-  // } else {
-  //   return await getFromWiki(language, length, words);
-  // }
-
-  return await getFromWiki(language, length, words);
+async function getWord(language, length, maxReqeusts) {
+  if (!maxReqeusts && language == "en") {
+    return await getEnglishWord(length);
+  } else {
+    return await getFromWiki(language, length);
+  }
 }
 
-async function getFromWiki(language, length, words) {
+async function getFromWiki(language, length) {
   const url = `https://${language}.wikipedia.org/w/api.php`;
 
   const params = {
@@ -37,24 +35,20 @@ async function getFromWiki(language, length, words) {
       const combinedWords = [...titleWords, ...extractWords];
       const word = combinedWords.find(
         (w) =>
-          w.length === length && (language == "en" ? isEnglish(w) : isHebrew(w))
+          w.length === length &&
+          (language == "en" ? isEnglish(w) : isHebrew(w))
       );
 
-      if (
-        result.exsit(word) &&
-        (await isWordInLanguage(word, language)) &&
-        !words.includes(word)
-      ) {
+      if (result.exsit(word) && (await isWordInLanguage(word, language)))
         return word;
-      }
     }
-    return getFromWiki(language, length, words);
+    return getFromWiki(language, length);
   } catch (error) {
     return error;
   }
 }
 
-async function getEnglishWord(length, words) {
+async function getEnglishWord(length) {
   const options = {
     method: "GET",
     url: "https://word-generator2.p.rapidapi.com/",
@@ -71,62 +65,60 @@ async function getEnglishWord(length, words) {
     if (wordList.length === 0) {
       return `No English words found with length ${length}.`;
     }
-    const word = wordList[Math.floor(Math.random() * wordList.length)];
-    console.log(length, word, wordList)
-    if (words.includes(word)) {
-      return getEnglishWord(length, words);
-    }
-    return word;
+    return wordList[Math.floor(Math.random() * wordList.length)];
   } catch (error) {
     return console.error("Error fetching word:", error);
   }
 }
 
 function isHebrew(str) {
-  const hebrewRegex = /^[\u0590-\u05FF]+$/;
+  const hebrewRegex = /^[\u0590-\u05FF\s]+$/; // Hebrew character range and whitespace allowed
   return hebrewRegex.test(str);
 }
 
 function isEnglish(text) {
   // Regular expression to match only English letters (both uppercase and lowercase) and spaces
-  const englishRegex = /^[A-Za-z]+$/;
+  const englishRegex = /^[A-Za-z\s]+$/;
   return englishRegex.test(text);
 }
 
 async function isWordInLanguage(word, language) {
   if (language == "he") {
     try {
-      const url = `https://he.wiktionary.org/w/api.php?action=query&titles=${word}&prop=categories|extracts&format=json&explaintext`;
+      const url = `https://he.wiktionary.org/w/api.php?action=query&titles=${word}&prop=extracts&format=json&explaintext`;
       const response = await axios.get(url);
 
       const pages = response.data.query.pages;
       const page = Object.values(pages)[0];
 
-      // If no page extract found, word does not exist
-      if (!page.extract) return false;
-
-      // Check if the word is categorized as a name
-      const isName =
-        page.categories &&
-        page.categories.some((category) =>
-          category.title.includes("שמות פרטיים")
-        );
-
-      return !isName; // Return true if it's a valid word and not a name
+      // If there is an extract, the word exists
+      return page.extract ? true : false;
     } catch (error) {
       console.error("Error:", error.message);
-      return false; // Error or not found
+      return false; // Word does not exist
     }
   } else {
-    const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`;
-
     try {
+      // Replace with the actual dictionary API URL (Wordnik, Oxford, etc.)
+      const url = `https://api.dictionaryapi.dev/api/v2/entries/${language}/${word}`;
+
+      // Make API request
       const response = await axios.get(url);
-      return response.data && response.data.length > 0;
+
+      // If a definition is found, the word exists in the language
+      if (response.data.length > 0) {
+        return true; // Word exists
+      }
     } catch (error) {
-      console.error("Error verifying word:", error.message);
-      return false; // Word not valid or error
+      // If the word doesn't exist or there's an error, return false
+      console.error(
+        "Error or word not found:",
+        error.response?.statusText || error.message
+      );
+      return false;
     }
+
+    return false;
   }
 }
 

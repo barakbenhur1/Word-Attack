@@ -27,7 +27,7 @@ async function login(email, name, language, res) {
     profile.save();
   }
 
-  res.send({});
+  res.send();
 }
 
 async function changeLanguage(email, language, res) {
@@ -36,7 +36,7 @@ async function changeLanguage(email, language, res) {
     profile.language = language;
     profile.save();
   }
-  res.send({});
+  res.send();
 }
 
 module.exports = router;

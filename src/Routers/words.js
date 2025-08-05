@@ -38,10 +38,10 @@ router.post("/scoreboard", function (req, res) {
 async function word(email, res) {
     const profile = await Profile.findOne({ email: email });
     let answer = {
-        word : {
-            Value: await req.getWord(profile.language, length, false)
-        }
+        value: await req.getWord(profile.language, 5, false)
     }
+
+    console.log(answer)
 
     res.send(answer)
 }
@@ -60,6 +60,7 @@ async function getWord(diffcultyKey, email, res) {
         },
     };
     
+    console.log(answer)
     res.send(answer);
 }
 
@@ -69,7 +70,7 @@ async function addGuess(diffcultyKey, email, guess, res) {
     const word = words[words.length - 1];
     word.guesswork.push(guess);
     member[1].save();
-    res.send();
+    res.send({});
 }
 
 async function score(diffcultyKey, email, res) {
@@ -80,7 +81,7 @@ async function score(diffcultyKey, email, res) {
     member[0].totalScore += 5 * points - word.guesswork.length * points;
     word.done = true;
     member[1].save();
-    res.send();
+    res.send({});
 }
 
 async function scoreboard(email, res) {
@@ -139,9 +140,7 @@ async function getMember(diffcultyKey, email) {
                         ? 5
                         : 6;
                         
-                        diffculty.words.push(
-                                             await req.getWord(profile.language, length, words.length == 10000)
-                                             );
+                        diffculty.words.push(await req.getWord(profile.language, length, words.length == 10000));
                         language.save();
                         return getMember(diffcultyKey, email);
                     }
