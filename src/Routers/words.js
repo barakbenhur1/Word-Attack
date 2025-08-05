@@ -41,6 +41,7 @@ async function word(email, res) {
         value: await req.getWord(profile.language, 5, false)
     }
 
+    
     res.send(answer)
 }
 
