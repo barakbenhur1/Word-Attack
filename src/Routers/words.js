@@ -6,33 +6,28 @@ const result = require("../Hendlers/Result");
 const Profile = require("../Schemas/Profile/Profile");
 const Languages = require("../Schemas/Lanuage/Languages");
 
-router.post("/word", function (req, res) {
-    const email = req.body.email;
-    word(email, res);
-});
-
 router.post("/getWord", function (req, res) {
-    const diffculty = req.body.diffculty;
-    const email = req.body.email;
-    getWord(diffculty, email, res);
+  const diffculty = req.body.diffculty;
+  const email = req.body.email;
+  getWord(diffculty, email, res);
 });
 
 router.post("/addGuess", function (req, res) {
-    const diffculty = req.body.diffculty;
-    const email = req.body.email;
-    const guess = req.body.guess;
-    addGuess(diffculty, email, guess, res);
+  const diffculty = req.body.diffculty;
+  const email = req.body.email;
+  const guess = req.body.guess;
+  addGuess(diffculty, email, guess, res);
 });
 
 router.post("/score", function (req, res) {
-    const diffculty = req.body.diffculty;
-    const email = req.body.email;
-    score(diffculty, email, res);
+  const diffculty = req.body.diffculty;
+  const email = req.body.email;
+  score(diffculty, email, res);
 });
 
 router.post("/scoreboard", function (req, res) {
-    const email = req.body.email;
-    scoreboard(email, res);
+  const email = req.body.email;
+  scoreboard(email, res);
 });
 
 async function word(email, res) {
@@ -45,20 +40,20 @@ async function word(email, res) {
 }
 
 async function getWord(diffcultyKey, email, res) {
-    let member = await getMember(diffcultyKey, email);
-    const words = member[0].words;
-    const word = words[words.length - 1];
-    const answer = {
-        score: member[0].totalScore,
-        isTimeAttack: words.length % 5 == 0,
-        number: words.length - 1,
-        word: {
-            value: word.value,
-            guesswork: word.guesswork,
-        },
-    };
-    
-    res.send(answer);
+  let member = await getMember(diffcultyKey, email);
+  const words = member[0].words;
+  const word = words[words.length - 1];
+  const answer = {
+    score: member[0].totalScore,
+    isTimeAttack: words.length % 5 == 0,
+    number: words.length - 1,
+    word: {
+      value: word.value,
+      guesswork: word.guesswork,
+    },
+  };
+
+  res.send(answer);
 }
 
 async function addGuess(diffcultyKey, email, guess, res) {
@@ -82,10 +77,14 @@ async function score(diffcultyKey, email, res) {
 }
 
 async function scoreboard(email, res) {
-    const profile = await Profile.findOne({ email: email });
-    const languageKey = profile.language;
-    let language = await Languages.findOne({ value: languageKey });
+  const profile = await Profile.findOne({ email: email });
+  const languageKey = profile.language;
+  let language = await Languages.findOne({ value: languageKey });
+  if (!result.exsit(language)) {
+    res.send([]);
+  } else {
     res.send(language.days);
+  }
 }
 
 async function getMember(diffcultyKey, email) {
